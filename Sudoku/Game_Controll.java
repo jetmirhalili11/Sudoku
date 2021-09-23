@@ -40,17 +40,22 @@ public class Game_Controll{
       addKeyboardAction();
    }
 
-   /** This method adds action to close a graphical window
-       As well as stops the solution of sudoku (if it was being solved) */  
-   public void addCloseWindow(){
+   /** This method adds action to graphical window (JFrame) to close windos by using "closeWindow" method */  
+   private void addCloseWindow(){
       view.getFrame().addWindowListener(
          new WindowAdapter() {
             public void windowClosing(WindowEvent event) {
-               solvingThread.stop();               // We stop solving sudoku (if it was being solved)
-               view.getFrame().dispose();          // Close window
+               closeWindow();
             }
          });
-      }
+   }
+
+   /** This method close a graphical window
+       As well as stops the solution of sudoku (if it was being solved) */  
+   private void closeWindow(){
+      solvingThread.stop();               // We stop solving sudoku (if it was being solved)
+      view.getFrame().dispose();          // Close window
+   }
    
    /** This method sets the button action (containing a number from 0 to 9)
        @param b is the Button to which the action will be placed
@@ -154,21 +159,27 @@ public class Game_Controll{
    /** This method creates a new Thread that is used to solve sudoku
        It is created so that the application runs separately and the solution is done separately */
    private void startThread() {
-         solvingThread= new Thread() {
+      solvingThread= 
+         new Thread() {
             public void run() {
-               view.setActiveButtons();
-               Calendar c1= Calendar.getInstance();                 // We save the time before the start to solve sudoku
-               boolean isSolved= BackTracking.solve(model);
-               Calendar c2= Calendar.getInstance();                 // We save the time after we end solving sudoku
-               view.setDirectSelected(0,-1);
-               if(isSolved)                                         // If the sudoku is solved we indicate how much time was needed that the sudoku was solved
-                  view.setMessage("Sudoku is solved for "+(c2.getTimeInMillis()-c1.getTimeInMillis())+" miliseconds");
-               else
-                  view.setMessage("This Sudoku can't be solved");
-               view.repaint(); 
-               view.setActiveButtons();
+               solveSudoku();
             }
          };
+   }
+   
+   /** This method solves a sudoku and tells the time was neeeded to solve it */
+   private void solveSudoku(){
+      view.setActiveButtons();
+      Calendar c1= Calendar.getInstance();                 // We save the time before the start to solve sudoku
+      boolean isSolved= BackTracking.solve(model);
+      Calendar c2= Calendar.getInstance();                 // We save the time after we end solving sudoku
+      view.setDirectSelected(0,-1);
+      if(isSolved)                                         // If the sudoku is solved we indicate how much time was needed that the sudoku was solved
+         view.setMessage("Sudoku is solved for "+(c2.getTimeInMillis()-c1.getTimeInMillis())+" miliseconds");
+      else
+         view.setMessage("This Sudoku can't be solved");
+      view.repaint(); 
+      view.setActiveButtons();
    }
    
    /** This method adds keyboard action so the buttons can also be used via the keyboard
